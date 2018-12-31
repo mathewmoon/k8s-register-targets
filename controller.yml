@@ -1,0 +1,66 @@
+apiVersion: metacontroller.k8s.io/v1alpha1
+kind: DecoratorController
+metadata:
+  name: log-target-data
+spec:
+  resources:
+  - apiVersion: v1
+    resource: pods
+    annotationSelector:
+      matchExpressions:
+      - {key: logTargetInfo, operator: Exists}
+  hooks:
+    sync:
+      webhook:
+        url: http://register-targets.metacontroller/log-info
+
+---
+apiVersion: metacontroller.k8s.io/v1alpha1
+kind: DecoratorController
+metadata:
+  name: register-target
+spec:
+  resources:
+  - apiVersion: v1
+    resource: pods
+    annotationSelector:
+      matchExpressions:
+      - {key: targetGroupArn, operator: Exists}
+      - {key: registerTarget, operator: Exists}
+  hooks:
+    sync:
+      webhook:
+        url: http://register-targets.metacontroller/register
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: register-targets
+  namespace: metacontroller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: register-targets
+  template:
+    metadata:
+      labels:
+        app: register-targets
+    spec:
+      containers:
+      - name: hooks
+        image: bashism/eks-register-targets:latest
+        imagePullPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: register-targets
+  namespace: metacontroller
+spec:
+  selector:
+    app: register-targets
+  ports:
+  - port: 80

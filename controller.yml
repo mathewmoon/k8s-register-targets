@@ -31,6 +31,9 @@ spec:
     sync:
       webhook:
         url: http://register-targets.metacontroller/register
+    finalize:
+      webhook:
+        url: http://register-targets.metacontroller/deregister
 
 ---
 apiVersion: apps/v1beta1

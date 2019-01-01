@@ -26,7 +26,7 @@ spec:
     annotationSelector:
       matchExpressions:
       - {key: targetGroupArn, operator: Exists}
-      - {key: registerTarget, operator: Exists}
+      - {key: targetPort, operator: Exists}
   hooks:
     sync:
       webhook:

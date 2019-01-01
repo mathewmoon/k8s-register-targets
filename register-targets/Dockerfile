@@ -9,7 +9,8 @@ RUN apk add --no-cache nodejs && \
     echo -e "*********************************\n*\tInstalling Express\t*\n*********************************" && \
     cd /app && \
     npm install --no-save express && \
-    npm install --no-save body-parser
+    npm install --no-save body-parser && \
+    npm install --no-save aws-sdk
 
 COPY server.js /app/server.js
 

@@ -13,7 +13,7 @@ spec:
     metadata:
       annotations:
         targetGroupArn: "MY_TARGET_GROUP_ARN"
-        registerTarget: "true"
+        targetPort: 80
         logTargetInfo: "true"
       labels:
         app: redirector

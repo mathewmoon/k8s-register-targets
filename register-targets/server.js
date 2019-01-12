@@ -23,10 +23,6 @@ app.post('/register', function(req, res){
   var targetIp = req.body.object.status.podIP;
   var targetPort = req.body.object.metadata.annotations.targetPort;
 
-	// Man this is some hacky shit, and I am not proud of it, but you know.......
-	var region = targetGroupArn.match(/us-(east|west)-[1-3]/);
-	AWS.config.update({region: region});
-
   if(!targetIp || targetIp == undefined || targetIp == null){
     res.status(400).json({ error: 'podIp not ready.' });
     return
@@ -59,10 +55,6 @@ app.post('/deregister', function(req, res){
   var targetGroupArn = req.body.object.metadata.annotations.targetGroupArn;
   var targetIp = req.body.object.status.podIP;
   var targetPort = req.body.object.metadata.annotations.targetPort;
-
-	// Man this is some hacky shit, and I am not proud of it, but you know.......
-	var region = targetGroupArn.match(/us-(east|west)-[1-3]/);
-	AWS.config.update({region: region});
 
   var params = {
     TargetGroupArn: targetGroupArn,

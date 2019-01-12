@@ -12,7 +12,7 @@ spec:
   hooks:
     sync:
       webhook:
-        url: http://register-targets.metacontroller/log-info
+        url: http://register-targets.metacontroller.svc.cluster.local/log-info
 
 ---
 apiVersion: metacontroller.k8s.io/v1alpha1
@@ -30,32 +30,33 @@ spec:
   hooks:
     sync:
       webhook:
-        url: http://register-targets.metacontroller/register
+        url: http://register-targets.metacontroller.svc.cluster.local/register
     finalize:
       webhook:
-        url: http://register-targets.metacontroller/deregister
+        url: http://register-targets.metacontroller.svc.cluster.local/deregister
 
 ---
-apiVersion: apps/v1beta1
-kind: Deployment
+apiVersion: extensions/v1beta1
+kind: DaemonSet
 metadata:
   name: register-targets
   namespace: metacontroller
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: register-targets
   template:
     metadata:
       labels:
         app: register-targets
+      annotations:
+        iam.amazonaws.com/role: {{ .Values.role }}
     spec:
       containers:
       - name: hooks
-        image: bashism/eks-register-targets:latest
+        image: {{ .Values.image }}
         imagePullPolicy: Always
-
+        env:
+        - name: AWS_REGION
+          value: {{ .Values.region }}
+        command: ["/bin/sh", "-ec", "while :; do echo '.'; sleep 5 ; done"]
 ---
 apiVersion: v1
 kind: Service

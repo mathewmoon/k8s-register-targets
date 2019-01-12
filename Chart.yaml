@@ -1,0 +1,16 @@
+name: k8s-register-targets
+version: 0.1.0
+appVersion: v0.1.0
+description: Register pods into AWS target groups using k8s metacontroller 
+keywords:
+  - aws
+  - k8s
+  - kubernetes
+  - metacontroller
+home: https://github.com/GoogleCloudPlatform/metacontroller
+sources:
+  - https://github.com/GoogleCloudPlatform/metacontroller
+maintainers:
+  - name: mathewmoon
+    email: mmoon@quinovas.com
+engine: gotpl

@@ -4,73 +4,88 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var AWS = require('aws-sdk');
 var elb = new AWS.ELBv2();
+var port = (process.env.PORT || process.env.VCAP_APP_PORT || 80);
 
 app.enable('trust proxy');
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
 
 app.post('/log-info', function(req, res) {
-	console.log(JSON.stringify(req.body));
-  res.json({ok: true});
+  console.log(JSON.stringify(req.body));
+  res.status(200);
 });
 
 app.post('/register', function(req, res){
-	var port = (process.env.PORT || process.env.VCAP_APP_PORT || 80);
-	var targetGroupArn = JSON.stringify(req.body.object.metadata.annotations.targetGroupArn);
-	var targetIp = JSON.stringify(req.body.object.status.podIP);
-	var targetPort = JSON.stringify(req.body.object.metadata.annotations.targetPort);
 
-	var params = {
-		TargetGroupArn: targetGroupArn,
-		Targets: [
-			{
-				Id: targetIp,
-				AvailabilityZone: 'all',
-				Port: targetPort
-			},
-		]
-	}
+  var targetGroupArn = req.body.object.metadata.annotations.targetGroupArn;
+  var targetIp = req.body.object.status.podIP;
+  var targetPort = req.body.object.metadata.annotations.targetPort;
 
-	elb.registerTargets(params, function(err, data) {
-	  if(err){
-			console.log(err, err.stack);
-			res.status(500).json({ error: 'Failed to register target.' });
-		}else{
-			console.log(data);
-			res.status(200).json({response: "Registered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn});
-		}
-	});
+	// Man this is some hacky shit, and I am not proud of it, but you know.......
+	var region = targetGroupArn.match(/us-(east|west)-[1-3]/);
+	AWS.config.update({region: region});
+
+  if(!targetIp || targetIp == undefined || targetIp == null){
+    res.status(400).json({ error: 'podIp not ready.' });
+    return
+  }
+
+
+  var params = {
+    TargetGroupArn: targetGroupArn,
+    Targets: [
+      {
+        Id: targetIp,
+        Port: targetPort
+      },
+    ]
+  }
+
+  elb.registerTargets(params, function(err, data) {
+    if(err){
+      console.log(err, err.stack);
+      res.status(500).json({ error: err, msg: 'Failed to register target.'});
+    }else{
+      console.log(data);
+      console.log("Registered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn);
+      res.status(200).json({response: "Registered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn});
+    }
+  });
 });
 
 app.post('/deregister', function(req, res){
-	var targetGroupArn = JSON.stringify(req.body.object.metadata.annotations.targetGroupArn);
-	var targetIp = JSON.stringify(req.body.object.status.podIP);
-	var targetPort = JSON.stringify(req.body.object.metadata.annotations.targetPort);
+  var targetGroupArn = req.body.object.metadata.annotations.targetGroupArn;
+  var targetIp = req.body.object.status.podIP;
+  var targetPort = req.body.object.metadata.annotations.targetPort;
 
-	var params = {
-	  TargetGroupArn: targetGroupArn,
-	  Targets: [
-	    {
-	      Id: targetIp,
-	      AvailabilityZone: 'all',
-	      Port: targetPort
-	    },
-	  ]
-	}
+	// Man this is some hacky shit, and I am not proud of it, but you know.......
+	var region = targetGroupArn.match(/us-(east|west)-[1-3]/);
+	AWS.config.update({region: region});
 
-	elb.deregisterTargets(params, function(err, data) {
-		if(err){
-			console.log(err, err.stack);
-			res.status(500).json({response: 'Failed to deregister target.', finalized: false });
-		}else{
-			console.log(data)
-			res.status(200).json({response: "Degistered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn, finalized: true});
-		}
-	});
+  var params = {
+    TargetGroupArn: targetGroupArn,
+    Targets: [
+        {
+        Id: targetIp,
+        AvailabilityZone: 'all',
+        Port: targetPort
+      },
+    ]
+  }
+
+  elb.deregisterTargets(params, function(err, data) {
+    if(err){
+      console.log(err, err.stack);
+      res.status(500).json({error: err, msg: 'Failed to deregister target.', finalized: false });
+    }else{
+      console.log(data)
+      res.status(200).json({response: "Degistered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn, finalized: true});
+    }
+  });
 });
 
 var server = app.listen(port, function() {
-        console.log('Listening on port %d', server.address().port);
+  console.log('Listening on port %d', server.address().port);
 });

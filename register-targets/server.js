@@ -10,8 +10,6 @@ app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
-
 app.post('/log-info', function(req, res) {
   console.log(JSON.stringify(req.body));
   res.status(200);
@@ -27,7 +25,6 @@ app.post('/register', function(req, res){
     res.status(400).json({ error: 'podIp not ready.' });
     return
   }
-
 
   var params = {
     TargetGroupArn: targetGroupArn,
@@ -46,7 +43,7 @@ app.post('/register', function(req, res){
     }else{
       console.log(data);
       console.log("Registered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn);
-      res.status(200).json({response: "Registered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn});
+      res.status(200).json({response: "Registered target: " + targetIp + ":" + targetPort + " to " + targetGroupArn});
     }
   });
 });
@@ -73,6 +70,7 @@ app.post('/deregister', function(req, res){
       res.status(500).json({error: err, msg: 'Failed to deregister target.', finalized: false });
     }else{
       console.log(data)
+      console.log("Deregistered target: " + targetIp + ":" + targetPort + " from " + targetGroupArn)
       res.status(200).json({response: "Degistered target: " + targetIp + ":" + targetPort + "to " + targetGroupArn, finalized: true});
     }
   });

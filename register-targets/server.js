@@ -53,6 +53,11 @@ app.post('/deregister', function(req, res){
   var targetIp = req.body.object.status.podIP;
   var targetPort = req.body.object.metadata.annotations.targetPort;
 
+  if(!targetIp || targetIp == undefined || targetIp == null){
+    res.status(200).json({ finalized: true 'podIp not supplied. Assuming pod was never ready and removing.' });
+    return
+  }
+
   var params = {
     TargetGroupArn: targetGroupArn,
     Targets: [
@@ -79,3 +84,4 @@ app.post('/deregister', function(req, res){
 var server = app.listen(port, function() {
   console.log('Listening on port %d', server.address().port);
 });
+

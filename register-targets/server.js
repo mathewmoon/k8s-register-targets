@@ -54,7 +54,7 @@ app.post('/deregister', function(req, res){
   var targetPort = req.body.object.metadata.annotations.targetPort;
 
   if(!targetIp || targetIp == undefined || targetIp == null){
-    res.status(200).json({ finalized: true 'podIp not supplied. Assuming pod was never ready and removing.' });
+    res.status(200).json({ finalized: true, message: 'podIp not supplied. Assuming pod was never ready and removing.' });
     return
   }
 

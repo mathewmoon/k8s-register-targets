@@ -1,5 +1,5 @@
 image: bashism/kubectl:latest
-#test6
+#test7
 pipelines:
   # Build off of any tag
   tags:

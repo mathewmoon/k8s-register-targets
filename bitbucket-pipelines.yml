@@ -1,0 +1,22 @@
+image: bashism/kubectl:latest
+
+pipelines:
+  # Build off of any tag
+  tags:
+    v*:
+      - step:
+          script:
+          script:
+            - helm tiller start-ci
+            - export HELM_HOST=127.0.0.1:44134
+            - helm upgrade register-targets . || helm install --name register-targets .
+            - kubectl get pods -n metacontroller
+  branches:
+    master:
+      - step:
+          script:
+            - helm tiller start-ci
+            - export HELM_HOST=127.0.0.1:44134
+            - helm upgrade register-targets . || helm install --name register-targets .
+            - kubectl get pods -n metacontroller
+            - exit 0

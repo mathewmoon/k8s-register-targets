@@ -9,7 +9,7 @@ keywords:
   - metacontroller
 home: https://github.com/GoogleCloudPlatform/metacontroller
 sources:
-  - https://github.com/GoogleCloudPlatform/metacontroller
+  - https://github.com/mathewmoon/k8s-register-targets
 maintainers:
   - name: mathewmoon
     email: mmoon@quinovas.com

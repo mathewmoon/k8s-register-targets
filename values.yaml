@@ -1,4 +1,4 @@
 
 image: bashism/eks-register-targets:latest
-role: ae-dev-kube-register-targets # The role that allows metacontroller to register the targets
+role: my-role-for-kiam # The role that allows metacontroller to register the targets
 region: us-east-1

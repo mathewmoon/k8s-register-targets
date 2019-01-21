@@ -7,10 +7,10 @@ keywords:
   - k8s
   - kubernetes
   - metacontroller
-home: https://github.com/GoogleCloudPlatform/metacontroller
+home: - https://github.com/mathewmoon/k8s-register-targets
 sources:
   - https://github.com/mathewmoon/k8s-register-targets
 maintainers:
   - name: mathewmoon
-    email: mmoon@quinovas.com
+    email: me@mathewmoon.net
 engine: gotpl

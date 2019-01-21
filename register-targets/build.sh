@@ -3,7 +3,6 @@
 PUSH=false
 TAG=latest
 CACHE=--no-cache
-REPOSITORY=bashism/eks-register-targets
 
 function usage(){
   cat<<EOF
@@ -47,6 +46,8 @@ while [[ ! -z $1 ]]; do
   esac
   shift
 done
+
+[ -z ${REPOSITORY} ] && echo "-r is required" && usage && exit 1
 
 CMD="docker build ${CACHE} -t ${REPOSITORY}:${TAG} ."
 
